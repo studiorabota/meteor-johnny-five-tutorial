@@ -1,11 +1,13 @@
 # Control your Arduino with a web app via Meteor and Johnny Five 
 
+>Chapter 1: Meteor and Johnny Five  
+Chapter 2: LED Matrix
+
 ## Chapter 1: Meteor and Johnny Five
 
 In the first chapter we will set up Meteor with Johnny Five and make an LED blink. Blink! Blink! 
 
-- Level: Intermediate
-- Skillset needed: A bit of JS and Node will help
+- Level: Intermediate. A bit of JS and Node will help
 - Time: 30 - 60 minutes
 - Hardware: Arduino, Led Matrix (or one LED)
 
@@ -106,7 +108,9 @@ Open the Arduino IDE:
 1. `File -> Examples -> Firmata -> StandardFirmata` 
 2. `Sketch -> Upload`
 
-Place a LED in port 13 and ground - [example](https://raw.githubusercontent.com/rwaldron/johnny-five/master/assets/led-blink.gif). It will start blinking because of the two lines below in Blink.js.
+Place a LED in port 13 and ground - [example](https://raw.githubusercontent.com/rwaldron/johnny-five/master/assets/led-blink.gif). 
+
+These are the lines of code in `blink.js` which make your LED blink.
 
 ~~~javascript
 var led = new JohnnyFive.Led(13);
