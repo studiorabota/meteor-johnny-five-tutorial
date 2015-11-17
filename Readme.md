@@ -62,7 +62,7 @@ You will now have a `Packages.json` file in your root directory. Open the file i
 
 Create a `server` folder and add a JS file, name it blink.js. Meteor will automatically pick it up.
 
-##### blink.js
+##### server/blink.js
 
 ~~~javascript
 var JohnnyFive = Meteor.npmRequire('johnny-five'),
@@ -116,7 +116,7 @@ Place a LED in port 13 and ground - [example](https://raw.githubusercontent.com/
 
 These are the lines of code in `blink.js` which make your LED blink.
 
-##### blink.js
+##### server/blink.js
 
 ~~~javascript
 var led = new JohnnyFive.Led(13);
@@ -132,7 +132,7 @@ Let's start with displaying a heart. Connect your board similar as in [this illu
 
 In `blink.js` replace the code with the following:
 
-##### blink.js
+##### server/blink.js
 
 ~~~javascript
 var JohnnyFive = Meteor.npmRequire('johnny-five'),
@@ -245,7 +245,7 @@ Meteor.methods({
 });
 ~~~
 
-##### blink.js
+##### server/blink.js
 
 The last thing to do is to catch this data in `blink.js`. We do this by making a loop with timeout and sending the `serverData` variable to the Arduino.
 
