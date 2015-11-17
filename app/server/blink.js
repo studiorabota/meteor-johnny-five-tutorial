@@ -8,11 +8,27 @@ Meteor.startup(function(){
         console.error('Johnny Five Error', error);
     });
 
-    board.on("ready", Meteor.bindEnvironment(function() {
+    board.on("ready", function() {
 
-        var led = new JohnnyFive.Led(13);
+        var matrix = new JohnnyFive.Led.Matrix({
+            pins: {
+                data: 2,
+                clock: 3,
+                cs: 4
+            }
+        });
 
-        led.blink(500);
+        matrix.on();
 
-    }, "ready"));
+        function next() {
+
+            matrix.draw(serverData);
+            setTimeout(next, 1000);
+
+        }
+
+        next();
+
+    });
+
 });

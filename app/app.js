@@ -10,8 +10,20 @@ if (Meteor.isClient) {
 
   Template.hello.events({
     'click button': function () {
-      // increment the counter when button is clicked
-      Session.set('counter', Session.get('counter') + 1);
+
+      var m = [
+        "10000001",
+        "11000011",
+        "10100101",
+        "10011001",
+        "10000001",
+        "10000001",
+        "10000001",
+        "10000001"
+      ];
+
+      Meteor.call('play', m);
+
     }
   });
 }

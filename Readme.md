@@ -26,7 +26,7 @@ $: meteor create app
 $: cd app
 ~~~
 
-### Adding Jonny Five to your Meteor app
+### 2. Add Jonny Five package
 
 Johnny Five will allow us to talk to the Arduino via Javascript. 
 
@@ -49,6 +49,8 @@ $: meteor
 
 You will now have a `Packages.json` file in your root directory. Open the file in your editor and add the packages in between the brackets - like below.
 
+##### packages.json
+
 ~~~json
 {
 	"serialport": "2.0.5",
@@ -56,9 +58,11 @@ You will now have a `Packages.json` file in your root directory. Open the file i
 }
 ~~~
 
-### Meteor
+### 3. Johnny Five code
 
 Create a `server` folder and add a JS file, name it blink.js. Meteor will automatically pick it up.
+
+##### blink.js
 
 ~~~javascript
 var JohnnyFive = Meteor.npmRequire('johnny-five'),
@@ -93,7 +97,7 @@ This will be the response if everything went okay:
 $: 'Board Looking for connected device..'
 ~~~
 
-### Arduino
+### 4. Arduino
 
 Install the [Arduino IDE](https://www.arduino.cc/en/Main/Software) and connect your Arduino. Check the terminal, this will now show the port number.. nerd delight.
 
@@ -112,6 +116,8 @@ Place a LED in port 13 and ground - [example](https://raw.githubusercontent.com/
 
 These are the lines of code in `blink.js` which make your LED blink.
 
+##### blink.js
+
 ~~~javascript
 var led = new JohnnyFive.Led(13);
 
@@ -122,4 +128,164 @@ led.blink(500);
 
 In this chapter we will control a 8 dot led matrix via a web interface.
 
-... Online soon ...  
+Let's start with displaying a heart. Connect your board similar as in [this illustration](https://github.com/rwaldron/johnny-five/blob/master/docs/led-matrix.md).
+
+In `blink.js` replace the code with the following:
+
+##### blink.js
+
+~~~javascript
+var JohnnyFive = Meteor.npmRequire('johnny-five'),
+    board;
+
+Meteor.startup(function(){
+    board = new JohnnyFive.Board();
+
+    board.on('error', function (error) {
+        console.error('Johnny Five Error', error);
+    });
+
+    board.on("ready", function() {
+
+        var heart = [
+            "01100110",
+            "10011001",
+            "10000001",
+            "10000001",
+            "01000010",
+            "00100100",
+            "00011000",
+            "00000000"
+        ];
+
+        var matrix = new JohnnyFive.Led.Matrix({
+            pins: {
+                data: 2,
+                clock: 3,
+                cs: 4
+            }
+        });
+
+        matrix.on();
+
+        matrix.draw(heart);
+
+    });
+
+});
+~~~
+
+You might have guessed it already, in the heart array 1 is for LED on and 0 for LED off.
+
+Now open `app.js` and find the following code:
+
+##### app.js
+
+~~~javascript
+Template.hello.events({
+    'click button': function () {
+      // increment the counter when button is clicked
+      Session.set('counter', Session.get('counter') + 1);
+    }
+});
+~~~
+
+Replace the code above with the one below:
+
+##### app.js
+
+~~~javascript
+Template.hello.events({
+    'click button': function () {
+
+      var m = [
+        "10000001",
+        "11000011",
+        "10100101",
+        "10011001",
+        "10000001",
+        "10000001",
+        "10000001",
+        "10000001"
+      ];
+
+      Meteor.call('play', m);
+
+    }
+});
+~~~
+   
+When you click on the button it will now send an **M** array to a Meteor method via `Meteor.call()`. We do this to parse the data to the server. Create a new file in the root directory called `methods.js`.
+
+##### methods.js
+
+~~~javascript
+serverData = [
+    "11111111",
+    "10011001",
+    "10000001",
+    "10000001",
+    "01000010",
+    "00100100",
+    "00011000",
+    "00000000"
+];
+
+// Send frames to Arduino
+Meteor.methods({
+    'play': function(data) {
+
+        if(Meteor.isServer) {
+
+            serverData = data;
+
+        }
+
+    }
+});
+~~~
+
+##### blink.js
+
+The last thing to do is to catch this data in `blink.js`. We do this by making a loop with timeout and sending the `serverData` variable to the Arduino.
+
+~~~javascript
+var JohnnyFive = Meteor.npmRequire('johnny-five'),
+    board;
+
+Meteor.startup(function(){
+    board = new JohnnyFive.Board();
+
+    board.on('error', function (error) {
+        console.error('Johnny Five Error', error);
+    });
+
+    board.on("ready", function() {
+
+        var matrix = new JohnnyFive.Led.Matrix({
+            pins: {
+                data: 2,
+                clock: 3,
+                cs: 4
+            }
+        });
+
+        matrix.on();
+
+        function next() {
+
+            matrix.draw(serverData);
+            setTimeout(next, 1000);
+
+        }
+
+        next();
+
+    });
+
+});
+~~~
+
+## Result
+
+If everything went okay you should now be able to click the button at `http://localhost:3000/` and see an **M** appear on your LED matrix. 
