@@ -289,3 +289,5 @@ Meteor.startup(function(){
 ## Result
 
 If everything went okay you should now be able to click the button at `http://localhost:3000/` and see an **M** appear on your LED matrix. 
+
+❤ - Meteor
